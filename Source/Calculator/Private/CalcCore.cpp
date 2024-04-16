@@ -34,14 +34,13 @@ bool ACalcCore::InputString(FString S)
 		return false;
 	}
 
-	if (S[0] == TCHAR('+') || S[0] == TCHAR('-') || S[0] == TCHAR('*') || S[0] == TCHAR('/') || S[0] == TCHAR('0'))
+	if (IsOperator(S[0]))
 	{
 		if (CalcString.IsEmpty())
 		{
 			return false;
 		}
-		TCHAR LastCh = CalcString[CalcString.Len() - 1];
-		if (LastCh == TCHAR('+') || LastCh == TCHAR('-') || LastCh == TCHAR('*') || LastCh == TCHAR('/'))
+		if (IsOperator(CalcString[CalcString.Len() - 1]))
 		{
 			return false;
 		}
@@ -56,6 +55,7 @@ bool ACalcCore::InputString(FString S)
 	if (S[0] == TCHAR('C'))
 	{
 		CalcString.Reset();
+		CalcResult.Reset();
 		return true;
 	}
 
@@ -70,12 +70,17 @@ bool ACalcCore::InputString(FString S)
 
 bool ACalcCore::Evaluate()
 {
+	if (IsOperator(CalcString[CalcString.Len() - 1]))
+	{
+		CalcString.RemoveAt(CalcString.Len() - 1);
+	}
+
 	TArray<int32> NumArray;
 	FString Operators;
 	FString CurNumStr;
 	for (auto& Ch : CalcString)
 	{
-		if (Ch == TCHAR('+') || Ch == TCHAR('-') || Ch == TCHAR('*') || Ch == TCHAR('/'))
+		if (IsOperator(Ch))
 		{
 			NumArray.Add(FCString::Atoi(*CurNumStr));
 			CurNumStr.Reset();
@@ -97,10 +102,15 @@ bool ACalcCore::Evaluate()
 	{
 		if (Operators[Index] == TCHAR('*'))
 		{
-			CurrNum *= NumArray[Index+1];
+			CurrNum *= NumArray[Index + 1];
 		}
-		if (Operators[Index] == TCHAR('/'))
+		else if (Operators[Index] == TCHAR('/'))
 		{
+			if (NumArray[Index + 1] == 0)
+			{
+				CalcResult = TEXT("division by 0");
+				return true;
+			}
 			CurrNum /= NumArray[Index + 1];
 		}
 		else
@@ -128,5 +138,10 @@ bool ACalcCore::Evaluate()
 
 	CalcResult = FString::FromInt(FinalNum);
 	return true;
+}
+
+bool ACalcCore::IsOperator(TCHAR Ch)
+{
+	return (Ch == TCHAR('+') || Ch == TCHAR('-') || Ch == TCHAR('*') || Ch == TCHAR('/'));
 }
 

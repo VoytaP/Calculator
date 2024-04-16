@@ -34,4 +34,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool Evaluate();
+
+private:
+	bool IsOperator(TCHAR Ch);
 };
