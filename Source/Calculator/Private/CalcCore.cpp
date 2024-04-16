@@ -48,6 +48,10 @@ bool ACalcCore::InputString(FString S)
 
 	if (S[0] == TCHAR('B'))
 	{
+		if (CalcString.IsEmpty())
+		{
+			return false;
+		}
 		CalcString.RemoveAt(CalcString.Len() - 1);
 		return true;
 	}
