@@ -65,6 +65,10 @@ bool ACalcCore::InputString(FString S)
 
 	if (S[0] == TCHAR('='))
 	{
+		if (CalcString.IsEmpty())
+		{
+			return false;
+		}
 		return Evaluate();
 	}
 
